@@ -27,6 +27,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Random;
 using Robust.Shared.Map.Components;
 using Content.Shared.Physics;
+using Content.Shared.Actions;
 
 namespace Content.Server._Starlight.NullSpace;
 
@@ -47,6 +48,7 @@ public sealed partial class NullSpaceSystem : SharedNullSpaceSystem
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
+    [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
 
     public override void Initialize()
     {
@@ -239,6 +241,7 @@ public sealed partial class NullSpaceSystem : SharedNullSpaceSystem
         if (TryComp<NullPhaseComponent>(uid, out var nullphase) && nullphase.ShuntCooldown is not null)
         {
             _usedelay.SetLength(uid, nullphase.ShuntCooldown.Value, "nullphase-delay");
+            _actionsSystem.SetCooldown(nullphase.PhaseAction, nullphase.ShuntCooldown.Value);
             _usedelay.TryResetDelay(uid, id: "nullphase-delay");
         }
 

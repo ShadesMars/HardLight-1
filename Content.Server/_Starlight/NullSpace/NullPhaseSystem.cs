@@ -62,6 +62,8 @@ public sealed class NullSpacePhaseSystem : EntitySystem
 
     private void OnEquipped(EntityUid uid, NullPhaseComponent component, GotEquippedEvent args)
     {
+        if (HasComp<BrighteyeComponent>(args.Equipee)) return;
+
         if (!TryComp<ClothingComponent>(uid, out var clothing)
             || !clothing.Slots.HasFlag(args.SlotFlags))
             return;
@@ -84,6 +86,8 @@ public sealed class NullSpacePhaseSystem : EntitySystem
 
     private void OnUnequipped(EntityUid uid, NullPhaseComponent component, GotUnequippedEvent args)
     {
+        if (HasComp<BrighteyeComponent>(args.Equipee)) return;
+
         if (TryComp<NullPhaseComponent>(args.Equipee, out var nullphase))
         {
             component.Cooldown = nullphase.Cooldown;
@@ -138,6 +142,12 @@ public sealed class NullSpacePhaseSystem : EntitySystem
             // HL - UseDelay.
             if (_usedelay.IsDelayed(uid, "nullphase-delay"))
                 return false;
+
+            if (HasComp<NullSpaceDrainerComponent>(uid))
+            {
+                _popup.PopupEntity(Loc.GetString("phase-fail-generic"), uid, uid);
+                return false;
+            }
 
             // No phaising if were in a container.
             if (_container.IsEntityInContainer(uid))

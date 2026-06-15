@@ -35,7 +35,7 @@
   categories: [HideSpawnMenu]
   components:
     - type: InstantAction
-      useDelay: 30
+      useDelay: 1
       icon:
         sprite: _Starlight/Interface/Actions/shadekin32.rsi
         state: create_shade

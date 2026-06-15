@@ -16,6 +16,12 @@ public sealed partial class ShadekinSystem : EntitySystem
 
     private void OnCreateShadeAction(EntityUid uid, BrighteyeComponent component, BrighteyeCreateShadeActionEvent args)
     {
+        if (HasComp<NullSpaceDrainerComponent>(uid))
+        {
+            _popup.PopupEntity(Loc.GetString("shadekin-fail-generic"), uid, uid);
+            return;
+        }
+
         if (TryComp<ShadegenComponent>(uid, out var shadegen))
         {
             RemComp(uid, shadegen);
@@ -37,6 +43,12 @@ public sealed partial class ShadekinSystem : EntitySystem
 
     private void OnPortalAction(EntityUid uid, BrighteyeComponent component, BrighteyePortalActionEvent args)
     {
+        if (HasComp<NullSpaceDrainerComponent>(uid))
+        {
+            _popup.PopupEntity(Loc.GetString("shadekin-fail-generic"), uid, uid);
+            return;
+        }
+
         if (HasComp<NullSpaceComponent>(uid)) // No making portals while in nullspace!
         {
             args.Handled = true;

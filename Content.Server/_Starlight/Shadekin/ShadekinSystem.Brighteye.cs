@@ -28,7 +28,8 @@ public sealed partial class ShadekinSystem : EntitySystem
             return;
         }
 
-        EnsureComp<NullPhaseComponent>(uid);
+        EnsureComp<NullPhaseComponent>(uid, out var nullphase);
+        nullphase.ShuntCooldown = TimeSpan.FromSeconds(120);
 
         _actionsSystem.AddAction(uid, ref component.PortalAction, component.BrighteyePortalAction, uid);
         _actionsSystem.AddAction(uid, ref component.CreateShadeAction, component.BrighteyeCreateShadeAction, uid);

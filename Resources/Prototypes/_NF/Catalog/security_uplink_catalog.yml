@@ -430,7 +430,7 @@
   id: UplinkSecurityBluespaceFlasher
   name: bluespace flasher
   description: A bluespace crystal set to a proximity trigger, useful for making an area off limits to Shadekin.
-  productEntity: BluespaceFlasher
+  productEntity: BluespaceFlasherFlatpack
   icon: { sprite: _HL/Objects/Weapons/bflash.rsi, state: off }
   cost:
     FrontierUplinkCoin: 4

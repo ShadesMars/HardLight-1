@@ -13,6 +13,7 @@
       randomTeleport: false
     - type: DarkPortal
     - type: Sprite
+      noRot: true
       sprite: _Starlight/Structures/Specific/Anomalies/dark.rsi
       layers:
         - state: portal
