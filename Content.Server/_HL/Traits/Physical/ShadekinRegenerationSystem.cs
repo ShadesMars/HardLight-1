@@ -26,7 +26,7 @@ public sealed class ShadekinRegenerationSystem : EntitySystem
 
         while (query.MoveNext(out var uid, out var regen, out var shadekin, out var damageable))
         {
-            if (shadekin.LightExposure > 0)
+            if (shadekin.CurrentState != ShadekinState.Dark)
                 continue;
 
             if (regen.NextUpdate > curTime)

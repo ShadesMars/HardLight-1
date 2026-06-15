@@ -1,29 +1,19 @@
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
+using Robust.Shared.Toolshed.TypeParsers;
 
 namespace Content.Server._Starlight.NullSpace;
 
 /// <summary>
-/// Component that actively scans for NullSpace entities and pulses to remove them.
-/// Replaces proximity-trigger detection which NullSpace entities can't participate in
-/// (their physics contacts are all cancelled).
+/// Trigger a NullSpaceShuntEvent on Trigger.
 /// </summary>
 [RegisterComponent, AutoGenerateComponentPause]
 public sealed partial class BluespacePulseOnTriggerComponent : Component
-{
-    [DataField]
     public float Radius = 10f;
 
     [DataField]
-    public string? RangeIndicatorPrototype;
-
-    public EntityUid? RangeIndicator;
+    public EntProtoId? Dome;
 
     [DataField]
-    public float StunSeconds = 4f;
-
-    [DataField]
-    public TimeSpan Cooldown = TimeSpan.FromSeconds(5);
-
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
-    public TimeSpan NextTrigger;
+    public EntityUid? CurrentDome;
 }

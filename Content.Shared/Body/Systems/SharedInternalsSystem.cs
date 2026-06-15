@@ -198,6 +198,10 @@ public abstract class SharedInternalsSystem : EntitySystem
         if (ent.Comp.BreathTools.Count == 0)
             return false;
 
+        // HL - Deny if in nullspace.
+        if (HasComp<NullSpaceComponent>(ent))
+            return false;
+
         if (TryComp(ent.Comp.GasTankEntity, out GasTankComponent? tank))
             _gasTank.DisconnectFromInternals((ent.Comp.GasTankEntity.Value, tank));
 
