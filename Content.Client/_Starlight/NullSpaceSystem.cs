@@ -18,6 +18,9 @@ public sealed partial class NullSpaceSystem : SharedNullSpaceSystem
 
     public override void Initialize()
     {
+        base.Initialize();
+
+        SubscribeLocalEvent<NullSpaceComponent, ComponentInit>(OnInit);
         SubscribeLocalEvent<NullSpaceComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<NullSpaceComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<NullSpaceComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);

@@ -22,6 +22,11 @@ using Content.Shared.Movement.Components;
 using Content.Shared.Body.Components;
 using Content.Server.Body.Systems;
 using Content.Shared.Timing;
+using Content.Shared.Maps;
+using Robust.Shared.Map;
+using Robust.Shared.Random;
+using Robust.Shared.Map.Components;
+using Content.Shared.Physics;
 
 namespace Content.Server._Starlight.NullSpace;
 
@@ -37,6 +42,11 @@ public sealed partial class NullSpaceSystem : SharedNullSpaceSystem
     [Dependency] private readonly VisibilitySystem _visibility = default!;
     [Dependency] private readonly InternalsSystem _internals = default!;
     [Dependency] private readonly UseDelaySystem _usedelay = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
+    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -128,6 +138,66 @@ public sealed partial class NullSpaceSystem : SharedNullSpaceSystem
         RemComp<TemperatureImmunityComponent>(uid);
 
         _virtualItem.DeleteInHandsMatching(uid, uid);
+
+        TrySlideToFreeTile(uid);
+    }
+
+    private static readonly Vector2i[] AdjacentOffsets =
+    [
+        new(0, 1), new(0, -1), new(1, 0), new(-1, 0),
+        new(1, 1), new(-1, 1), new(1, -1), new(-1, -1),
+    ];
+
+    private void TrySlideToFreeTile(EntityUid uid)
+    {
+        var currentTile = _turf.GetTileRef(Transform(uid).Coordinates);
+        if (currentTile == null)
+            return;
+
+        // MobMask covers everything a normal mob cannot walk through: walls (Impassable),
+        // but also windows, shutters, glass airlocks, half-walls, etc.
+        if (!_turf.IsTileBlocked(currentTile.Value, CollisionGroup.MobMask))
+            return;
+
+        if (!TryComp<MapGridComponent>(currentTile.Value.GridUid, out var grid))
+            return;
+
+        Span<int> indices = stackalloc int[AdjacentOffsets.Length];
+        foreach (var i in ShuffledRange(indices))
+        {
+            var tileIndices = currentTile.Value.GridIndices + AdjacentOffsets[i];
+            if (!_mapSystem.TryGetTileRef(currentTile.Value.GridUid, grid, tileIndices, out var candidate))
+                continue;
+
+            if (!_turf.IsTileBlocked(candidate, CollisionGroup.MobMask))
+            {
+                _transform.SetCoordinates(uid, _turf.GetTileCenter(candidate));
+                return;
+            }
+        }
+
+        // Second pass: all neighbours were MobMask-blocked (e.g. surrounded by windows/shutters).
+        // Settle for any tile free of solid walls so the entity is at least not geometry-clipping.
+        foreach (var i in indices)
+        {
+            var tileIndices = currentTile.Value.GridIndices + AdjacentOffsets[i];
+            if (!_mapSystem.TryGetTileRef(currentTile.Value.GridUid, grid, tileIndices, out var candidate))
+                continue;
+
+            if (!_turf.IsTileBlocked(candidate, CollisionGroup.Impassable))
+            {
+                _transform.SetCoordinates(uid, _turf.GetTileCenter(candidate));
+                return;
+            }
+        }
+    }
+
+    private Span<int> ShuffledRange(Span<int> buffer)
+    {
+        for (var i = 0; i < buffer.Length; i++)
+            buffer[i] = i;
+        _random.Shuffle(buffer);
+        return buffer;
     }
 
     public void OnRemove(EntityUid uid, NullSpaceComponent component, ComponentRemove args)

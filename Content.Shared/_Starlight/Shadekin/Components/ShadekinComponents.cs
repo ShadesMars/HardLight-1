@@ -29,7 +29,7 @@ public sealed partial class ShadekinComponent : Component
     public SortedDictionary<FixedPoint2, ShadekinState> Thresholds = new();
 
     [DataField]
-    public SoundSpecifier? CutoffSound = new SoundPathSpecifier("/Audio/_HL/Effects/ma cutoff.ogg");
+    public SoundSpecifier CutoffSound = new SoundPathSpecifier("/Audio/_HL/Effects/ma cutoff.ogg");
 }
 
 [Serializable, NetSerializable]
@@ -49,21 +49,6 @@ public enum ShadekinState : byte
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class BrighteyeComponent : Component
 {
-    [DataField]
-    public ProtoId<AlertPrototype> BrighteyeAlert { get; set; } = "ShadekinEnergy";
-
-    /// <summary>
-    /// How many Energy the brighteye has.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public int Energy = 0;
-
-    /// <summary>
-    /// The Max Energy the brighteye can have.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public int MaxEnergy = 200;
-
     /// <summary>
     /// Shadekin Portal, if null then the portal does not exist.
     /// </summary>
@@ -74,37 +59,13 @@ public sealed partial class BrighteyeComponent : Component
     public EntityUid? PortalAction;
 
     [DataField]
-    public EntityUid? PhaseAction;
-
-    [DataField]
-    public EntityUid? DarkTrapAction;
-
-    [DataField]
     public EntityUid? CreateShadeAction;
 
     [DataField]
     public EntProtoId BrighteyePortalAction = "BrighteyePortalAction";
 
     [DataField]
-    public EntProtoId BrighteyePhaseAction = "BrighteyePhaseAction";
-
-    [DataField]
-    public EntProtoId BrighteyeDarkTrapAction = "BrighteyeDarkTrapAction";
-
-    [DataField]
     public EntProtoId BrighteyeCreateShadeAction = "BrighteyeCreateShadeAction";
-
-    [DataField]
-    public int PortalCost = 150;
-
-    [DataField]
-    public int PhaseCost = 50; // Scales with CurrentState.
-
-    [DataField]
-    public int DarkTrapCost = 80;
-
-    [DataField]
-    public int CreateShadeCost = 50;
 
     [DataField]
     public EntProtoId ShadekinShadow = "ShadekinShadow";
@@ -113,47 +74,12 @@ public sealed partial class BrighteyeComponent : Component
     public EntProtoId PortalShadekin = "PortalShadekin";
 
     [DataField]
-    public EntProtoId ShadekinTrap = "ShadekinTrapSpawn";
+    public SoundSpecifier ShadegenSound = new SoundPathSpecifier("/Audio/_Starlight/Effects/Shadekin/nullphase.ogg");
 }
 
-public sealed class OnAttemptEnergyUseEvent : CancellableEntityEventArgs
-{
-    /// <summary>
-    /// The user attempting.
-    /// </summary>
-    public EntityUid User { get; }
-
-    /// <summary>
-    /// Triggers when a Brighteye attempt to use their energy.
-    /// </summary>
-    /// <param name="user"></param>
-    public OnAttemptEnergyUseEvent(EntityUid user)
-    {
-        User = user;
-    }
-}
 #endregion
 #region Abilities
-
-[RegisterComponent]
-public sealed partial class DarkTrapComponent : Component
-{
-    [DataField]
-    public EntProtoId DarkNet = "ShadekinDarkNet";
-
-    [DataField]
-    public TimeSpan StunAmount = TimeSpan.FromSeconds(10);
-}
-
 public sealed partial class BrighteyePortalActionEvent : InstantActionEvent { }
-public sealed partial class BrighteyePhaseActionEvent : InstantActionEvent { }
-public sealed partial class BrighteyeDarkTrapActionEvent : InstantActionEvent { }
-public sealed partial class BrighteyeCreateShadeActionEvent : InstantActionEvent { }
 
-[Serializable, NetSerializable]
-public sealed partial class PhaseDoAfterEvent : SimpleDoAfterEvent
-{
-    public override DoAfterEvent Clone() => this;
-    public int Cost;
-}
+public sealed partial class BrighteyeCreateShadeActionEvent : InstantActionEvent { }
 #endregion

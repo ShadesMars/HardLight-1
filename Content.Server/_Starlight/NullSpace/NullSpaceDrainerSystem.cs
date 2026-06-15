@@ -1,5 +1,4 @@
 using Content.Server._Starlight.Shadekin;
-using Content.Shared._Starlight.Shadekin;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Popups;
@@ -12,10 +11,6 @@ public sealed class NullSpaceDrainerSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     public override void Initialize()
     {
-        SubscribeLocalEvent<NullSpaceDrainerComponent, OnAttemptEnergyUseEvent>(OnAttempt);
-
-        SubscribeLocalEvent<NullSpaceDrainerComponent, ResearchServerGetPointsPerSecondEvent>(OnGetPointsPerSecond);
-
         SubscribeLocalEvent<NullSpaceDrainerComponent, GotEquippedEvent>(OnEquipped);
         SubscribeLocalEvent<NullSpaceDrainerComponent, GotUnequippedEvent>(OnUnequipped);
     }
@@ -40,16 +35,5 @@ public sealed class NullSpaceDrainerSystem : EntitySystem
     {
         RemComp<NullSpaceDrainerComponent>(args.Equipee);
         component.Target = null;
-    }
-
-    // You fucking monster... coding this makes me sad for my kins.
-    private void OnGetPointsPerSecond(EntityUid uid, NullSpaceDrainerComponent component, ref ResearchServerGetPointsPerSecondEvent args)
-    {
-        if (component.Drains && component.Target is not null && TryComp<BrighteyeComponent>(component.Target.Value, out var brighteye) && brighteye.Energy > 0)
-        {
-            brighteye.Energy -= 1;
-            args.Points += component.Points;
-            Dirty(component.Target.Value, brighteye);
-        }
     }
 }

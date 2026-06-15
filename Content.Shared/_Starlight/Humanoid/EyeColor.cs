@@ -1,3 +1,5 @@
+namespace Content.Shared.Humanoid;
+
 public static class EyeColor
 {
     public const float ShadekinBrightness = 0.251f;

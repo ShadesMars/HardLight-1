@@ -17,6 +17,8 @@ using Content.Shared.Inventory;
 using Content.Shared._Starlight.Shadekin;
 using Content.Shared.Timing;
 using Robust.Shared.Timing;
+using Content.Server._Starlight.Shadekin;
+using Content.Shared.Sprite;
 
 namespace Content.Server._Starlight.NullSpace;
 
@@ -32,6 +34,7 @@ public sealed class NullSpacePhaseSystem : EntitySystem
     [Dependency] private readonly InventorySystem _inventorySystem = default!;
     [Dependency] private readonly UseDelaySystem _usedelay = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly SharedScaleVisualsSystem _scaleVisuals = default!;
 
     private readonly EntProtoId _shadekinShadow = "ShadekinShadow";
     private readonly EntProtoId ShadekinPhaseInEffect = "ShadekinPhaseInEffect";
@@ -121,9 +124,10 @@ public sealed class NullSpacePhaseSystem : EntitySystem
     {
         if (TryComp<NullSpaceComponent>(uid, out var nullspace))
         {
-            var tileref = _turf.GetTileRef(Transform(uid).Coordinates);
-            if (tileref != null
-            && _physics.GetEntitiesIntersectingBody(uid, (int)CollisionGroup.Impassable).Count > 0)
+            var currentTile = _turf.GetTileRef(Transform(uid).Coordinates);
+            // MobMask (not just Impassable) so that windows, shutters, glass airlocks, and anything
+            // else a normal mob cannot walk through also prevents exit — not only solid walls.
+            if (currentTile != null && _turf.IsTileBlocked(currentTile.Value, CollisionGroup.MobMask))
             {
                 _popup.PopupEntity(Loc.GetString("revenant-in-solid"), uid, uid);
                 return false;
@@ -195,6 +199,7 @@ public sealed class NullSpacePhaseSystem : EntitySystem
                     _ghost.DoGhostBooEvent(light);
 
                 var effect = SpawnAtPosition(ShadekinPhaseInEffect, Transform(uid).Coordinates);
+                _scaleVisuals.SetSpriteScale(effect, _scaleVisuals.GetSpriteScale(uid));
                 Transform(effect).LocalRotation = Transform(uid).LocalRotation;
             }
             else
@@ -205,6 +210,7 @@ public sealed class NullSpacePhaseSystem : EntitySystem
         else
         {
             EnsureComp<NullSpaceComponent>(uid);
+            RemComp<ShadegenComponent>(uid);
 
             if (TryComp<ShadekinComponent>(uid, out var shadekin))
             {
@@ -214,6 +220,7 @@ public sealed class NullSpacePhaseSystem : EntitySystem
                     _ghost.DoGhostBooEvent(light);
 
                 var effect = SpawnAtPosition(ShadekinPhaseOutEffect, Transform(uid).Coordinates);
+                _scaleVisuals.SetSpriteScale(effect, _scaleVisuals.GetSpriteScale(uid));
                 Transform(effect).LocalRotation = Transform(uid).LocalRotation;
             }
             else

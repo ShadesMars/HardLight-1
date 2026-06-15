@@ -1,6 +1,4 @@
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
-using Robust.Shared.Toolshed.TypeParsers;
 
 namespace Content.Server._Starlight.NullSpace;
 
@@ -9,6 +7,7 @@ namespace Content.Server._Starlight.NullSpace;
 /// </summary>
 [RegisterComponent, AutoGenerateComponentPause]
 public sealed partial class BluespacePulseOnTriggerComponent : Component
+{
     public float Radius = 10f;
 
     [DataField]

@@ -31,10 +31,8 @@ public sealed class DarkPortalSystem : EntitySystem
     {
         base.Initialize();
         SubscribeLocalEvent<DarkPortalComponent, ComponentStartup>(OnInit);
-        SubscribeLocalEvent<DarkPortalComponent, AnomalyPulseEvent>(OnPulse);
-        SubscribeLocalEvent<DarkPortalComponent, AnomalySupercriticalEvent>(OnSupercritical);
-        SubscribeLocalEvent<DarkPortalComponent, AnomalyShutdownEvent>(OnShutdown);
-
+        SubscribeLocalEvent<DarkPortalComponent, NullSpaceShuntEvent>(NullSpaceShunt);
+        SubscribeLocalEvent<DarkPortalComponent, ComponentShutdown>(OnComponentShutdown);
         SubscribeLocalEvent<DarkPortalComponent, GetVerbsEvent<InteractionVerb>>(OnGetInteractionVerbs);
         SubscribeLocalEvent<DarkPortalComponent, OnAttemptPortalEvent>(OnAttemptPortal);
         SubscribeLocalEvent<DarkPortalComponent, ExaminedEvent>(OnExamined);
@@ -48,51 +46,18 @@ public sealed class DarkPortalSystem : EntitySystem
                 _link.TryLink(uid, target);
     }
 
-    private void OnPulse(EntityUid uid, DarkPortalComponent component, ref AnomalyPulseEvent args)
+    private void NullSpaceShunt(EntityUid uid, DarkPortalComponent component, NullSpaceShuntEvent args)
     {
-        var range = component.PulseRange * args.Stability * args.PowerModifier;
-
-        // foreach (var ent in _lookup.GetEntitiesInRange(Transform(uid).Coordinates, range))
-        //     _light.TryDestroyBulb(ent);
-
-        int newenergy = _random.Next(5, 30) * (int)args.Stability * (int)args.PowerModifier;
-
-        foreach (var ent in _lookup.GetEntitiesInRange<BrighteyeComponent>(Transform(uid).Coordinates, range))
-        {
-            ent.Comp.Energy = Math.Clamp(ent.Comp.Energy + newenergy, 0, ent.Comp.MaxEnergy);
-            Dirty(ent.Owner, ent.Comp);
-        }
+        SpawnAtPosition(component.ShadekinShadow, Transform(uid).Coordinates);
+        QueueDel(uid);
     }
 
-    private void OnSupercritical(EntityUid uid, DarkPortalComponent component, ref AnomalySupercriticalEvent args)
+    private void OnComponentShutdown(EntityUid uid, DarkPortalComponent component, ref ComponentShutdown args)
     {
-        var range = component.PulseRange * 3 * args.PowerModifier;
-
-        // foreach (var ent in _lookup.GetEntitiesInRange<PoweredLightComponent>(Transform(uid).Coordinates, range))
-        //     _light.TryDestroyBulb(ent.Owner, ent.Comp);
-
-        foreach (var ent in _lookup.GetEntitiesInRange<BrighteyeComponent>(Transform(uid).Coordinates, range))
-        {
-            ent.Comp.Energy = ent.Comp.MaxEnergy;
-            Dirty(ent.Owner, ent.Comp);
-        }
-
-        if (TryComp<AnomalyComponent>(uid, out var anomaly))
-        {
-            _sharedAnomalySystem.ChangeAnomalyStability(uid, -0.5f, anomaly);
-            _sharedAnomalySystem.ChangeAnomalySeverity(uid, -0.5f, anomaly);
-            _sharedAnomalySystem.ChangeAnomalyHealth(uid, 1f, anomaly);
-            _anomalySystem.ShuffleParticlesEffect((uid, anomaly));
-        }
-    }
-
-    private void OnShutdown(EntityUid uid, DarkPortalComponent component, ref AnomalyShutdownEvent args)
-    {
-        if (args.Supercritical || component.Brighteye is null || !TryComp<BrighteyeComponent>(component.Brighteye.Value, out var brighteye))
+        if (component.Brighteye is null || !TryComp<BrighteyeComponent>(component.Brighteye.Value, out var brighteye))
             return;
 
         OnPortalShutdown(component.Brighteye.Value, brighteye);
-        QueueDel(uid);
     }
 
     public void OnPortalShutdown(EntityUid uid, BrighteyeComponent component)
@@ -109,19 +74,6 @@ public sealed class DarkPortalSystem : EntitySystem
             return;
 
         args.PushMarkup(Loc.GetString("shadekin-portal-owner"));
-        if (TryComp<AnomalyComponent>(uid, out var anomaly))
-        {
-            if (anomaly.Stability > anomaly.GrowthThreshold)
-                args.PushMarkup(Loc.GetString("shadekin-portal-stability-unstable"));
-            else
-                args.PushMarkup(Loc.GetString("shadekin-portal-stability-stable"));
-
-            var severity = anomaly.Severity;
-            var health = anomaly.Health;
-
-            args.PushMarkup(Loc.GetString("anomaly-scanner-severity-percentage", ("percent", severity.ToString("P"))));
-            args.PushMarkup(Loc.GetString("shadekin-portal-health-percentage", ("percent", health.ToString("P"))));
-        }
     }
 
     // APPRENTLY... MOVING THIS TO SHARED IS NOT TRIGGERED? SO I HAVE TO FUCKING COPY/PASTE ON CLIENT? WTF?
@@ -143,7 +95,7 @@ public sealed class DarkPortalSystem : EntitySystem
 
     private void OnGetInteractionVerbs(EntityUid uid, DarkPortalComponent component, ref GetVerbsEvent<InteractionVerb> args)
     {
-        if (!args.CanAccess || component.Brighteye != args.User || !TryComp<AnomalyComponent>(uid, out var anomaly))
+        if (!args.CanAccess || component.Brighteye != args.User)
             return;
 
         var user = args.User;
@@ -160,24 +112,5 @@ public sealed class DarkPortalSystem : EntitySystem
             },
             Text = Loc.GetString("shadekin-portal-destroy"),
         });
-
-        if (TryComp<BrighteyeComponent>(user, out var brighteye))
-        {
-            args.Verbs.Add(new()
-            {
-                Act = () =>
-                {
-                    if (_shadekin.OnAttemptEnergyUse(user, brighteye, 50))
-                    {
-                        _sharedAnomalySystem.ChangeAnomalyStability(uid, -0.15f, anomaly);
-                        _sharedAnomalySystem.ChangeAnomalySeverity(uid, -0.15f, anomaly);
-                        _sharedAnomalySystem.ChangeAnomalyHealth(uid, 0.3f, anomaly);
-                    }
-                },
-                Text = Loc.GetString("shadekin-portal-stabilize"),
-                Message = brighteye.Energy < component.StabilizeCost ? Loc.GetString("shadekin-noenergy") : Loc.GetString("shadekin-portal-stabilize-info"),
-                Disabled = brighteye.Energy < component.StabilizeCost,
-            });
-        }
     }
 }

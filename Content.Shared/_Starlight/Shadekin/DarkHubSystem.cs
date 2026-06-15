@@ -51,12 +51,12 @@ public sealed class DarkHubSystem : EntitySystem
         var query = EntityQueryEnumerator<GatewayComponent, TransformComponent>();
         while (query.MoveNext(out var warpEnt, out var warpPointComp, out var xform))
         {
-            if (!warpPointComp.Enabled)
+            if (!warpPointComp.Enabled || !warpPointComp.Interactable)
                 continue;
 
             // HL - We now look for if the gateway is part of the station to avoid issues.
             if (xform.GridUid == EntityUid.Invalid || !HasComp<StationMemberComponent>(xform.GridUid))
-                return;
+                continue;
 
             warps.Add(warpEnt);
         }
@@ -66,7 +66,6 @@ public sealed class DarkHubSystem : EntitySystem
         EnsureComp<PortalTimeoutComponent>(args.Subject);
 
         var coords = Transform(target).Coordinates;
-        SpawnAtPosition(component.ShadekinShadow, coords);
         _transform.SetCoordinates(args.Subject, coords);
 
         args.Cancel(); // Duh, we need to handle the teleport ourself!

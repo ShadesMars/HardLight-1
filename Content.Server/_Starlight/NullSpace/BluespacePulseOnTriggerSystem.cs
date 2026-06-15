@@ -41,7 +41,6 @@ public sealed class BluespacePulseOnTriggerSystem : EntitySystem
     private void OnCrystalActivated(Entity<BluespacePulseOnTriggerComponent> ent, ref TriggerEvent args)
     {
         if (TryComp<StackComponent>(ent, out var stack))
-        {
             _stack.Use(ent, 1, stack);
 
         // Do NOT call _trigger.Trigger(uid) here — TriggerOnUse/TriggerOnActivate already fired TriggerEvent

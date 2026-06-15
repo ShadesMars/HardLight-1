@@ -31,6 +31,7 @@ using Content.Server.Power.Components;
 using Content.Server.Nutrition.EntitySystems;
 using Content.Shared.Mind.Components;
 using Content.Server._Starlight.NullSpace;
+using Content.Shared._Starlight.NullSpace;
 
 namespace Content.Server.FloofStation;
 

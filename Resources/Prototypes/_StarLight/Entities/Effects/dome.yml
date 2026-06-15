@@ -8,7 +8,7 @@
       fix1:
         shape:
           !type:PhysShapeCircle
-          radius: 12
+          radius: 6.2
         density: 0
         hard: false
         mask:
@@ -18,14 +18,11 @@
   - type: Sprite
     drawdepth: WallTops
     sprite: Effects/EnergyDome/energydome_big.rsi
-    scale: 4.8, 4.8
+    scale: 2.5, 2.5
     layers:
     - state: big
       color: "#6c15ae"
-  # - type: Stealth
-    # minVisibility: 0.8
-    # maxVisibility: 0.8
-    # lastVisibility: 0.8
+      shader: unshaded
   - type: NullSpaceBlocker
     bypassPVS: true
     unphaseOnCollide: false

@@ -6,7 +6,7 @@ namespace Content.Shared._Starlight.Shadekin;
 public sealed partial class ShadegenComponent : Component
 {
     [DataField, AutoNetworkedField]
-    public float Range = 8f;
+    public float Range = 5f;
 
     [DataField]
     public bool DestroyLights = false;

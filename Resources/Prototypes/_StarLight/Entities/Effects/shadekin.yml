@@ -67,16 +67,3 @@
       netsync: false
       drawdepth: Effects
       noRot: true
-
-- type: entity
-  id: ShadekinShadegen
-  categories: [HideSpawnMenu]
-  components:
-  - type: Shadegen
-  - type: Physics
-    canCollide: false
-  - type: EmitSoundOnSpawn
-    sound:
-      path: /Audio/_Starlight/Effects/Shadekin/nullphase.ogg
-  - type: TimedDespawn
-    lifetime: 20

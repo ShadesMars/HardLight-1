@@ -1,6 +1,7 @@
 using Content.Shared._Starlight.Shadekin;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Teleportation.Components;
+using Content.Shared.Throwing;
 
 namespace Content.Client._Starlight.Shadekin;
 
@@ -22,6 +23,9 @@ public sealed class DarkPortalSystem : EntitySystem
         // TODO: Check if we have the Nullspace Suit?
 
         if (TryComp<PullableComponent>(args.Subject, out var pullablea) && pullablea.BeingPulled && HasComp<BrighteyeComponent>(pullablea.Puller))
+            return;
+
+        if (TryComp<ThrownItemComponent>(args.Subject, out var thrown) && HasComp<BrighteyeComponent>(thrown.Thrower))
             return;
 
         args.Cancel();
