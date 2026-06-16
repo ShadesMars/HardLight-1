@@ -8,6 +8,7 @@ namespace Content.Server._Starlight.NullSpace;
 [RegisterComponent, AutoGenerateComponentPause]
 public sealed partial class BluespacePulseOnTriggerComponent : Component
 {
+    [DataField]
     public float Radius = 10f;
 
     [DataField]
