@@ -4730,3 +4730,89 @@ Entries:
         a 33% reduction
   id: 505
   time: '2026-06-12T22:45:42.0000000+00:00'
+- author: re-silvered
+  changes:
+    - type: Tweak
+      message: Syndicate expedition npcs no longer death rattle alert.
+  id: 506
+  time: '2026-06-15T23:25:22.0000000+00:00'
+- author: Slatebreaker
+  changes:
+    - type: Tweak
+      message: Cyborgs now spawn with PDAs with Cyborg IDs
+    - type: Tweak
+      message: QuadBorg IDs now have their respective job icons
+  id: 507
+  time: '2026-06-15T23:26:05.0000000+00:00'
+- author: Iisazel
+  changes:
+    - type: Tweak
+      message: Argocyte blades are no longer the strongest weapon in the game
+  id: 508
+  time: '2026-06-15T23:30:26.0000000+00:00'
+- author: Typheus
+  changes:
+    - type: Tweak
+      message: >-
+        Station AI name changes to character name if positronic brain is
+        inserted during construction
+  id: 509
+  time: '2026-06-15T23:31:59.0000000+00:00'
+- author: FieryTech
+  changes:
+    - type: Tweak
+      message: New xenoborg mothership mapping, for all your assimilation needs.
+  id: 510
+  time: '2026-06-15T23:33:45.0000000+00:00'
+- author: Typheus
+  changes:
+    - type: Tweak
+      message: Ship AIs have comms restricted from Command and Security
+  id: 511
+  time: '2026-06-15T23:34:19.0000000+00:00'
+- author: IngvarJackal
+  changes:
+    - type: Add
+      message: >-
+        Late-round "Quiet before storm" event that brings an eerie lull followed
+        by a department-themed crisis.
+    - type: Tweak
+      message: >-
+        Station events now ramp up in danger over the shift instead of firing at
+        random.
+    - type: Tweak
+      message: >-
+        Major threats (nuke ops, xenoborgs, zombie outbreaks) no longer stack
+        with other big events, and Central Command's threat detection will hint
+        at their presence after 60 minutes.
+  id: 512
+  time: '2026-06-15T23:35:14.0000000+00:00'
+- author: BackeTako
+  changes:
+    - type: Add
+      message: Added a Scandinavian Accent
+  id: 513
+  time: '2026-06-15T23:35:47.0000000+00:00'
+- author: okdamsam
+  changes:
+    - type: Add
+      message: Slow ooc admin command
+  id: 514
+  time: '2026-06-15T23:36:15.0000000+00:00'
+- author: re-silvered
+  changes:
+    - type: Add
+      message: >-
+        Added a new reagent that cures addictine, but cannot exist outside
+        someone's bloodstream.
+    - type: Add
+      message: Chemicals that spoil have a new dropdown in their guidebook entry!
+    - type: Tweak
+      message: Updated the existing chemical spoilage system.
+    - type: Fix
+      message: >-
+        Fixed nanites instantly turning inert inside every bloodstream except
+        synth's. They will now appropriately maul anyone that gets it inside of
+        them
+  id: 515
+  time: '2026-06-16T00:12:26.0000000+00:00'
